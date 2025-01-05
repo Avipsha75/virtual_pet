@@ -6,7 +6,6 @@ import threading
 INVENTORY_FILE = "inventory.txt"
 LEADERBOARD_FILE = "leaderboard.txt"
 
-# Pet attributes
 HUNGER = 50
 HAPPINESS = 50
 ENERGY = 50
@@ -22,7 +21,7 @@ def feed_pet():
     global HUNGER, HAPPINESS, ENERGY
     food = random.choice(["Chicken", "Egg", "Biscuits", "Milk"])
 
-    HUNGER = min(HUNGER + 10, 100)  # Increase hunger (max 100)
+    HUNGER = min(HUNGER + 10, 100)  
 
     print(f"\nYou fed {food} to your pet!")
     print(f"Current stats - Hunger: {HUNGER}, Happiness: {HAPPINESS}, Energy: {ENERGY}")
@@ -33,8 +32,8 @@ def play_with_pet():
     global HUNGER, HAPPINESS, ENERGY
     toy = random.choice(["Balls", "Frisbees", "Rope", "Squeaky Toys"])
 
-    HAPPINESS = min(HAPPINESS + 15, 100)  # Increase happiness (max 100)
-    ENERGY = max(ENERGY - 20, 0)  # Decrease energy (min 0)
+    HAPPINESS = min(HAPPINESS + 15, 100)  
+    ENERGY = max(ENERGY - 20, 0)  
 
     print(f"\nYou played with {toy} with your pet!")
     print(f"Current stats - Hunger: {HUNGER}, Happiness: {HAPPINESS}, Energy: {ENERGY}")
@@ -45,8 +44,8 @@ def rest_pet():
     global HUNGER, HAPPINESS, ENERGY
     mat = random.choice(["Bed", "Cushion", "Blanket", "Carpet"])
 
-    ENERGY = min(ENERGY + 15, 100)  # Increase energy (max 100)
-    HUNGER = max(HUNGER - 5, 0)  # Decrease hunger (min 0)
+    ENERGY = min(ENERGY + 15, 100)  
+    HUNGER = max(HUNGER - 5, 0)  
 
     print(f"\nYour pet rested on {mat}!")
     print(f"Current stats - Hunger: {HUNGER}, Happiness: {HAPPINESS}, Energy: {ENERGY}")
@@ -61,7 +60,7 @@ def load_from_file(filename):
 
 def display_inventory():
     """Display the inventory"""
-    inventory = load_from_file(INVENTORY_FILE)  # Load from the inventory file instead of leaderboard
+    inventory = load_from_file(INVENTORY_FILE)  
     if inventory:
         print("\nInventory:")
         for item in inventory:
@@ -73,13 +72,12 @@ def update_leaderboard(pet_name, score):
     """Update the leaderboard with the current score"""
     save_to_file(LEADERBOARD_FILE, f"{pet_name}: {score}")
 
-# Timer thread function
 def countdown_timer(timeout):
     """Countdown timer that stops when the user inputs something."""
     for i in range(timeout, -1, -1):
         print(f"Time remaining: {i} seconds", end="\r")
         time.sleep(1)
-        if input_received:  # If input is received, stop the countdown
+        if input_received: 
             break
     if not input_received:
         print("\nTime's up! Game Over.")
@@ -87,38 +85,33 @@ def countdown_timer(timeout):
 def get_user_input_with_timer(prompt, timeout):
     """Get user input with a countdown timer"""
     global input_received
-    input_received = False  # Reset input_received flag
+    input_received = False  
 
-    # Start the countdown timer in a separate thread
     timer_thread = threading.Thread(target=countdown_timer, args=(timeout,))
     timer_thread.start()
 
-    # Get user input (This will work without blocking the countdown)
     user_input = input(f"{prompt} (You have {timeout} seconds to respond): ").strip()
     
-    input_received = True  # User input received
-    timer_thread.join()  # Wait for the timer thread to finish
+    input_received = True  
+    timer_thread.join()  
 
     return user_input
 
-# Check for pet sickness or winning condition
 def check_pet_status():
     """Check the pet's health and winning condition"""
     global HUNGER, HAPPINESS, ENERGY, CONSECUTIVE_WINNING_TURNS
 
-    # If any attribute is 0, pet gets sick and the game ends
     if HUNGER == 0 or HAPPINESS == 0 or ENERGY == 0:
         print("\nYour pet got sick! Game Over.")
         return False
 
-    # If all attributes are above 80 for 3 consecutive turns, pet wins
     if HUNGER > 80 and HAPPINESS > 80 and ENERGY > 80:
         CONSECUTIVE_WINNING_TURNS += 1
         if CONSECUTIVE_WINNING_TURNS >= 3:
             print("\nYour pet is super happy and energetic! You WIN!")
             return False
     else:
-        CONSECUTIVE_WINNING_TURNS = 0  # Reset winning turns if conditions are not met
+        CONSECUTIVE_WINNING_TURNS = 0  
 
     return True
 
@@ -139,24 +132,24 @@ def virtual_pet():
         print("1. Feed your pet")
         print("2. Play with your pet")
         print("3. Rest")
-        print("4. View your inventory")  # Corrected option to view inventory
+        print("4. View your inventory") 
         print("5. Quit and save progress")
         choice = get_user_input_with_timer("Enter your choice (1/2/3/4/5):", 10)
 
         if choice == "1":
             food = feed_pet()
-            save_to_file(INVENTORY_FILE, food)  # Save food to inventory
+            save_to_file(INVENTORY_FILE, food) 
             score += 1
         elif choice == "2":
             toy = play_with_pet()
-            save_to_file(INVENTORY_FILE, toy)  # Save toy to inventory
+            save_to_file(INVENTORY_FILE, toy)  
             score += 1
         elif choice == "3":
             mat = rest_pet()
-            save_to_file(INVENTORY_FILE, mat)  # Save mat to inventory
+            save_to_file(INVENTORY_FILE, mat)  
             score += 1
         elif choice == "4":
-            display_inventory()  # Now this will show the inventory
+            display_inventory()  
         elif choice == "5":
             print(f"\nThanks for playing with {pet_name}!")
             print(f"You collected {score} treasures.")
@@ -164,13 +157,12 @@ def virtual_pet():
             break
         elif choice == "":
             print("Game over! You lost your turn due to timeout!")
-            break  # End the game
+            break 
         else:
             print("Invalid choice. Please try again.")
 
-        # Check if the pet is sick or has won
         if not check_pet_status():
-            break  # End the game if pet is sick or won
+            break  
 
 def display_leaderboard():
     """Display the leaderboard"""
